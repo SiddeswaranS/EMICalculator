@@ -432,11 +432,11 @@
                         </div>
                         <div class="metric">
                             <span class="metric-label">Total Interest Paid</span>
-                            <span class="metric-value" id="bankInterest">₹0</span>
+                            <span class="metric-value" id="bankTotalInterest">₹0</span>
                         </div>
                         <div class="metric">
                             <span class="metric-label">Total Amount Paid</span>
-                            <span class="metric-value" id="bankTotal">₹0</span>
+                            <span class="metric-value" id="bankTotalAmount">₹0</span>
                         </div>
                     </div>
                 </div>
@@ -461,11 +461,11 @@
                         </div>
                         <div class="metric">
                             <span class="metric-label">Total Interest Paid</span>
-                            <span class="metric-value" id="nonBankInterest">₹0</span>
+                            <span class="metric-value" id="nonBankTotalInterest">₹0</span>
                         </div>
                         <div class="metric">
                             <span class="metric-label">Total Amount Paid</span>
-                            <span class="metric-value" id="nonBankTotal">₹0</span>
+                            <span class="metric-value" id="nonBankTotalAmount">₹0</span>
                         </div>
                     </div>
                 </div>
@@ -579,15 +579,15 @@
             document.getElementById('bankEMI').textContent = formatCurrency(bankEMI);
             document.getElementById('bankPrincipal').textContent = formatCurrency(loanAmount);
             document.getElementById('bankAvgInterest').textContent = formatCurrency(bankTotalInterest / tenure);
-            document.getElementById('bankInterest').textContent = formatCurrency(bankTotalInterest);
-            document.getElementById('bankTotal').textContent = formatCurrency(bankTotalAmount);
+            document.getElementById('bankTotalInterest').textContent = formatCurrency(bankTotalInterest);
+            document.getElementById('bankTotalAmount').textContent = formatCurrency(bankTotalAmount);
 
             // Update Non-Bank Method UI
             document.getElementById('nonBankMonthly').textContent = formatCurrency(nonBankMonthlyInterest);
             document.getElementById('nonBankPrincipal').textContent = formatCurrency(loanAmount);
             document.getElementById('nonBankMonthlyFixed').textContent = formatCurrency(nonBankMonthlyInterest);
-            document.getElementById('nonBankInterest').textContent = formatCurrency(nonBankTotalInterest);
-            document.getElementById('nonBankTotal').textContent = formatCurrency(nonBankTotalAmount);
+            document.getElementById('nonBankTotalInterest').textContent = formatCurrency(nonBankTotalInterest);
+            document.getElementById('nonBankTotalAmount').textContent = formatCurrency(nonBankTotalAmount);
 
             document.getElementById('savingsAmount').textContent = formatCurrency(savings);
             document.getElementById('savingsText').textContent = `That's ${savingsPercent}% less than Non-Bank method!`;
