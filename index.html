@@ -372,7 +372,7 @@
         </div>
 
         <div class="info-box">
-            <strong>📘 How it works:</strong> Enter your loan details below. The calculator compares two methods:
+            <strong>How it works:</strong> Enter your loan details below. The calculator compares two methods:
             <br>• <strong>Bank Method</strong> - Your payment (EMI) stays same but principal reduces each month (cheaper overall)
             <br>• <strong>Non-Bank Method</strong> - Pay only interest monthly, principal stays same (pay full amount at end)
         </div>
@@ -471,14 +471,26 @@
                 </div>
             </div>
 
-            <div class="chart-card">
-                <h3>📈 Visual Comparison</h3>
-                <div class="chart-container">
-                    <canvas id="comparisonChart"></canvas>
+            <div class="comparison-grid">
+                <div class="chart-card">
+                    <h3>📈 Principal Balance Over Time</h3>
+                    <div class="chart-container">
+                        <canvas id="comparisonChart"></canvas>
+                    </div>
+                    <p style="color: #666; font-size: 0.85em; margin-top: 10px; text-align: center;">
+                        Blue line shows how your principal reduces monthly with Bank method. Orange line shows principal stays same with Non-Bank method.
+                    </p>
                 </div>
-                <p style="color: #666; font-size: 0.85em; margin-top: 10px; text-align: center;">
-                    Blue line shows how your principal reduces monthly with Bank method. Orange line shows principal stays same with Non-Bank method.
-                </p>
+
+                <div class="chart-card">
+                    <h3>🥧 Total Payment Breakdown</h3>
+                    <div class="chart-container">
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                    <p style="color: #666; font-size: 0.85em; margin-top: 10px; text-align: center;">
+                        Compare total interest paid vs principal amount for both methods.
+                    </p>
+                </div>
             </div>
 
             <div class="chart-card">
@@ -523,6 +535,7 @@
 
     <script>
         let comparisonChart = null;
+        let pieChart = null;
 
         function showTable(type) {
             const bankTable = document.getElementById('bankTable');
@@ -596,6 +609,7 @@
             generateBankTable(loanAmount, bankEMI, bankMonthlyRate, tenure);
             generateNonBankTable(loanAmount, nonBankMonthlyInterest, tenure);
             generateChart(loanAmount, bankEMI, bankMonthlyRate, tenure);
+            generatePieChart(loanAmount, bankTotalInterest, nonBankTotalInterest);
 
             document.getElementById('results').classList.remove('hidden');
         }
@@ -780,6 +794,71 @@
                             },
                             grid: {
                                 display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function generatePieChart(principal, bankInterest, nonBankInterest) {
+            const ctx = document.getElementById('pieChart').getContext('2d');
+            
+            if (pieChart) {
+                pieChart.destroy();
+            }
+            
+            pieChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Principal Amount', 'Bank Interest', 'Non-Bank Interest'],
+                    datasets: [{
+                        label: 'Amount in ₹',
+                        data: [principal, bankInterest, nonBankInterest],
+                        backgroundColor: [
+                            '#4caf50',
+                            '#1a73e8',
+                            '#f57c00'
+                        ],
+                        borderWidth: 3,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    size: 12
+                                },
+                                padding: 15,
+                                usePointStyle: true,
+                                generateLabels: function(chart) {
+                                    const data = chart.data;
+                                    return data.labels.map((label, i) => {
+                                        const value = data.datasets[0].data[i];
+                                        return {
+                                            text: label + ': ₹' + Math.round(value).toLocaleString('en-IN'),
+                                            fillStyle: data.datasets[0].backgroundColor[i],
+                                            hidden: false,
+                                            index: i
+                                        };
+                                    });
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return label + ': ₹' + Math.round(value).toLocaleString('en-IN') + ' (' + percentage + '%)';
+                                }
                             }
                         }
                     }
