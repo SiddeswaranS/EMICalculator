@@ -372,7 +372,7 @@
         </div>
 
         <div class="info-box">
-            <strong>How it works:</strong> Enter your loan details below. The calculator compares two methods:
+            <strong>📘 How it works:</strong> Enter your loan details below. The calculator compares two methods:
             <br>• <strong>Bank Method</strong> - Your payment (EMI) stays same but principal reduces each month (cheaper overall)
             <br>• <strong>Non-Bank Method</strong> - Pay only interest monthly, principal stays same (pay full amount at end)
         </div>
@@ -381,7 +381,7 @@
             <div class="input-row">
                 <div class="input-group">
                     <label>💵 Loan Amount</label>
-                    <input type="number" id="loanAmount" value="1300000" min="0" oninput="calculate()">
+                    <input type="text" id="loanAmount" value="13,00,000" oninput="formatLoanInput(this); calculate()">
                     <small>Total amount you want to borrow</small>
                 </div>
                 <div class="input-group">
@@ -559,14 +559,30 @@
             return '₹' + Math.round(amount).toLocaleString('en-IN');
         }
 
+        function formatLoanInput(input) {
+            // Remove all non-digit characters
+            let value = input.value.replace(/[^\d]/g, '');
+            
+            // Format with Indian numbering system
+            if (value) {
+                value = parseInt(value).toLocaleString('en-IN');
+            }
+            
+            input.value = value;
+        }
+
+        function parseLoanAmount(value) {
+            // Remove all non-digit characters and parse as number
+            return parseFloat(value.replace(/[^\d]/g, '')) || 0;
+        }
+
         function calculate() {
-            const loanAmount = parseFloat(document.getElementById('loanAmount').value);
+            const loanAmount = parseLoanAmount(document.getElementById('loanAmount').value);
             const tenure = parseInt(document.getElementById('loanTenure').value);
             const bankYearlyRate = parseFloat(document.getElementById('bankInterest').value);
             const nonBankYearlyRate = parseFloat(document.getElementById('nonBankInterest').value);
 
             if (!loanAmount || !tenure || !bankYearlyRate || !nonBankYearlyRate) {
-                alert('Please fill all fields');
                 return;
             }
 
