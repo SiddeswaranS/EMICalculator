@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EMI Calculator</title>
+    <title>Loan Calculator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -13,384 +14,782 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            background-color: #f0f2f5;
+            padding: 15px;
+            line-height: 1.5;
         }
 
         .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 900px;
-            width: 100%;
-            padding: 40px;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-        }
-
-        .calc-wrapper {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-        }
-
-        .input-section {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        label {
-            font-weight: 600;
-            color: #555;
-            font-size: 0.95em;
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        input[type="number"], input[type="range"] {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1em;
-            transition: border-color 0.3s;
-        }
-
-        input[type="number"]:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        input[type="range"] {
-            padding: 0;
-            height: 8px;
-            background: #e0e0e0;
-            border: none;
-            cursor: pointer;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            background: #667eea;
-            cursor: pointer;
-            border-radius: 50%;
-        }
-
-        input[type="range"]::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            background: #667eea;
-            cursor: pointer;
-            border-radius: 50%;
-            border: none;
-        }
-
-        .value-display {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #667eea;
-            font-weight: 600;
-            pointer-events: none;
-        }
-
-        .results-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 15px;
-            padding: 30px;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 25px;
-        }
-
-        .result-item {
-            text-align: center;
-        }
-
-        .result-label {
-            font-size: 0.9em;
-            opacity: 0.9;
+            color: #1a73e8;
+            font-size: 1.8em;
             margin-bottom: 8px;
         }
 
-        .result-value {
-            font-size: 2em;
-            font-weight: 700;
-        }
-
-        .emi-value {
-            font-size: 2.5em;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            margin-bottom: 10px;
-        }
-
-        .breakdown {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 10px;
-        }
-
-        .breakdown-item {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 15px;
-            border-radius: 10px;
-        }
-
-        .breakdown-label {
-            font-size: 0.85em;
-            opacity: 0.9;
-        }
-
-        .breakdown-value {
-            font-size: 1.3em;
-            font-weight: 600;
-            margin-top: 5px;
-        }
-
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 8px;
-            font-size: 1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin-top: 10px;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        .quick-adjust {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-top: 10px;
-        }
-
-        .quick-adjust input {
-            flex: 1;
-            padding: 10px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
+        .subtitle {
+            color: #666;
             font-size: 0.95em;
         }
 
-        .adjust-btn {
-            width: 45px;
-            height: 45px;
-            padding: 0;
-            margin: 0;
-            font-size: 1.5em;
-            font-weight: bold;
+        .input-card {
+            background: white;
+            padding: 20px;
             border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+            font-size: 0.9em;
+        }
+
+        .input-group small {
+            color: #888;
+            font-size: 0.85em;
+            display: block;
+            margin-top: 3px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 3px rgba(26,115,232,0.1);
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 14px;
+            background: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .calculate-btn:hover {
+            background: #1557b0;
+        }
+
+        .info-box {
+            background: #e8f4fd;
+            border-left: 4px solid #1a73e8;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .info-box strong {
+            color: #1a73e8;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .method-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-top: 4px solid #1a73e8;
+        }
+
+        .method-card.non-bank {
+            border-top-color: #f57c00;
+        }
+
+        .method-card h3 {
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 1.2em;
+        }
+
+        .method-card .description {
+            color: #777;
+            font-size: 0.85em;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .metric {
             display: flex;
-            align-items: center;
-            justify-content: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
         }
 
-        .minus-btn {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        .metric:last-child {
+            border-bottom: none;
         }
 
-        .plus-btn {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        .metric-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .metric-value {
+            font-weight: 700;
+            color: #333;
+            font-size: 1em;
+        }
+
+        .big-number {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .big-number-label {
+            color: #666;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+
+        .big-number-value {
+            color: #1a73e8;
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+        .method-card.non-bank .big-number-value {
+            color: #f57c00;
+        }
+
+        .savings-card {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .savings-card h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+
+        .savings-amount {
+            font-size: 2em;
+            font-weight: 700;
+            color: #4caf50;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .chart-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: #666;
+        }
+
+        .tab.active {
+            background: #1a73e8;
+            color: white;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 0.9em;
+        }
+
+        th {
+            background: #f5f5f5;
+            color: #333;
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e0e0e0;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tr:hover {
+            background: #fafafa;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .expand-row {
+            background: #f5f5f5;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .expand-row:hover {
+            background: #e8e8e8;
+        }
+
+        .expand-row td {
+            text-align: center;
+            color: #1a73e8;
+            font-weight: 600;
+            padding: 15px;
+        }
+
+        .expand-icon {
+            margin-right: 5px;
         }
 
         @media (max-width: 768px) {
-            .calc-wrapper {
+            h1 {
+                font-size: 1.4em;
+            }
+
+            .input-row {
                 grid-template-columns: 1fr;
             }
 
-            h1 {
-                font-size: 2em;
+            .comparison-grid {
+                grid-template-columns: 1fr;
             }
 
-            .container {
-                padding: 25px;
+            .chart-container {
+                height: 250px;
+            }
+
+            .big-number-value {
+                font-size: 1.5em;
+            }
+
+            table {
+                font-size: 0.8em;
+            }
+
+            th, td {
+                padding: 8px 5px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .header, .input-card, .method-card, .chart-card {
+                padding: 15px;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab {
+                width: 100%;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>💰 EMI Calculator</h1>
-        
-        <div class="calc-wrapper">
-            <div class="input-section">
-                <div class="input-group">
-                    <label for="loanAmount">Loan Amount (₹)</label>
-                    <div class="input-wrapper">
-                        <input type="number" id="loanAmount" value="500000" min="10000" step="10000">
-                    </div>
-                    <input type="range" id="loanAmountRange" min="10000" max="10000000" value="500000" step="10000">
-                    
-                    <div class="quick-adjust">
-                        <input type="number" id="adjustValue" value="50000" min="1000" step="1000" placeholder="Amount">
-                        <button class="adjust-btn minus-btn" onclick="adjustLoanAmount(-1)">−</button>
-                        <button class="adjust-btn plus-btn" onclick="adjustLoanAmount(1)">+</button>
-                    </div>
-                </div>
+        <div class="header">
+            <h1>💰 Loan Calculator</h1>
+            <p class="subtitle">Compare Bank vs Non-Bank loan methods and find the best option</p>
+        </div>
 
-                <div class="input-group">
-                    <label for="interestRate">Interest Rate (% per annum)</label>
-                    <div class="input-wrapper">
-                        <input type="number" id="interestRate" value="10" min="1" max="30" step="0.1">
-                    </div>
-                    <input type="range" id="interestRateRange" min="1" max="30" value="10" step="0.1">
-                </div>
+        <div class="info-box">
+            <strong>📘 How it works:</strong> Enter your loan details below. The calculator compares two methods:
+            <br>• <strong>Bank Method</strong> - Your payment (EMI) stays same but principal reduces each month (cheaper overall)
+            <br>• <strong>Non-Bank Method</strong> - Pay only interest monthly, principal stays same (pay full amount at end)
+        </div>
 
+        <div class="input-card">
+            <div class="input-row">
                 <div class="input-group">
-                    <label for="loanTenure">Loan Tenure (Months)</label>
-                    <div class="input-wrapper">
-                        <input type="number" id="loanTenure" value="60" min="1" max="360" step="1">
-                    </div>
-                    <input type="range" id="loanTenureRange" min="1" max="360" value="60" step="1">
+                    <label>💵 Loan Amount</label>
+                    <input type="number" id="loanAmount" value="1300000" min="0" oninput="calculate()">
+                    <small>Total amount you want to borrow</small>
                 </div>
+                <div class="input-group">
+                    <label>📅 Loan Tenure</label>
+                    <input type="number" id="loanTenure" value="60" min="1" oninput="calculate()">
+                    <small>Number of months to repay</small>
+                </div>
+            </div>
+            <div class="input-row">
+                <div class="input-group">
+                    <label>📊 Bank Interest Rate (Yearly %)</label>
+                    <input type="number" id="bankInterest" value="10.80" step="0.01" min="0" oninput="calculate()">
+                    <small>Reducing balance method</small>
+                </div>
+                <div class="input-group">
+                    <label>📊 Non-Bank Interest Rate (Yearly %)</label>
+                    <input type="number" id="nonBankInterest" value="12.00" step="0.01" min="0" oninput="calculate()">
+                    <small>Flat rate on full principal</small>
+                </div>
+            </div>
+        </div>
 
-                <button onclick="calculateEMI()">Calculate EMI</button>
+        <div id="results" class="hidden">
+            <div class="savings-card" id="savingsCard">
+                <h3>💡 You Save with Bank Method</h3>
+                <div class="savings-amount" id="savingsAmount">₹0</div>
+                <p style="color: #666; margin-top: 10px; font-size: 0.9em;" id="savingsText"></p>
             </div>
 
-            <div class="results-section">
-                <div class="result-item">
-                    <div class="result-label">Monthly EMI</div>
-                    <div class="result-value emi-value">₹<span id="emiAmount">10,624</span></div>
+            <div class="comparison-grid">
+                <div class="method-card">
+                    <h3>🏦 Bank Method (EMI)</h3>
+                    <p class="description">Your monthly payment stays same. Each month, you pay less interest and more principal as balance reduces.</p>
+                    
+                    <div class="big-number">
+                        <div class="big-number-label">Monthly EMI</div>
+                        <div class="big-number-value" id="bankEMI">₹0</div>
+                    </div>
+
+                    <div style="margin-top: 15px;">
+                        <div class="metric">
+                            <span class="metric-label">Principal Amount</span>
+                            <span class="metric-value" id="bankPrincipal">₹0</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Avg Monthly Interest</span>
+                            <span class="metric-value" id="bankAvgInterest">₹0</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Total Interest Paid</span>
+                            <span class="metric-value" id="bankInterest">₹0</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Total Amount Paid</span>
+                            <span class="metric-value" id="bankTotal">₹0</span>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="breakdown">
-                    <div class="breakdown-item">
-                        <div class="breakdown-label">Principal Amount</div>
-                        <div class="breakdown-value">₹<span id="principalAmount">5,00,000</span></div>
+                <div class="method-card non-bank">
+                    <h3>🏪 Non-Bank Method (Interest Only)</h3>
+                    <p class="description">Pay only interest monthly. Principal amount stays same throughout. You pay full principal at the end of tenure.</p>
+                    
+                    <div class="big-number">
+                        <div class="big-number-label">Monthly Interest Payment</div>
+                        <div class="big-number-value" id="nonBankMonthly">₹0</div>
                     </div>
-                    <div class="breakdown-item">
-                        <div class="breakdown-label">Total Interest</div>
-                        <div class="breakdown-value">₹<span id="totalInterest">1,37,449</span></div>
+
+                    <div style="margin-top: 15px;">
+                        <div class="metric">
+                            <span class="metric-label">Principal Amount</span>
+                            <span class="metric-value" id="nonBankPrincipal">₹0</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Monthly Interest (Fixed)</span>
+                            <span class="metric-value" id="nonBankMonthlyFixed">₹0</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Total Interest Paid</span>
+                            <span class="metric-value" id="nonBankInterest">₹0</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Total Amount Paid</span>
+                            <span class="metric-value" id="nonBankTotal">₹0</span>
+                        </div>
                     </div>
-                    <div class="breakdown-item">
-                        <div class="breakdown-label">Total Amount</div>
-                        <div class="breakdown-value">₹<span id="totalAmount">6,37,449</span></div>
-                    </div>
-                    <div class="breakdown-item">
-                        <div class="breakdown-label">Loan Tenure</div>
-                        <div class="breakdown-value"><span id="tenureDisplay">60</span> months</div>
-                    </div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3>📈 Visual Comparison</h3>
+                <div class="chart-container">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+                <p style="color: #666; font-size: 0.85em; margin-top: 10px; text-align: center;">
+                    Blue line shows how your principal reduces monthly with Bank method. Orange line shows principal stays same with Non-Bank method.
+                </p>
+            </div>
+
+            <div class="chart-card">
+                <h3>📋 Monthly Breakdown</h3>
+                <div class="tabs">
+                    <button class="tab active" onclick="showTable('bank')">🏦 Bank Method</button>
+                    <button class="tab" onclick="showTable('nonbank')">🏪 Non-Bank Method</button>
+                </div>
+
+                <div id="bankTable" class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Opening Balance</th>
+                                <th>EMI Payment</th>
+                                <th>Interest Part</th>
+                                <th>Principal Part</th>
+                                <th>Closing Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bankTableBody"></tbody>
+                    </table>
+                </div>
+
+                <div id="nonBankTable" class="table-wrapper hidden">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Principal Outstanding</th>
+                                <th>Monthly Interest</th>
+                                <th>Total Interest So Far</th>
+                            </tr>
+                        </thead>
+                        <tbody id="nonBankTableBody"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        function formatNumber(num) {
-            return num.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+        let comparisonChart = null;
+
+        function showTable(type) {
+            const bankTable = document.getElementById('bankTable');
+            const nonBankTable = document.getElementById('nonBankTable');
+            const tabs = document.querySelectorAll('.tab');
+
+            if (type === 'bank') {
+                bankTable.classList.remove('hidden');
+                nonBankTable.classList.add('hidden');
+                tabs[0].classList.add('active');
+                tabs[1].classList.remove('active');
+            } else {
+                bankTable.classList.add('hidden');
+                nonBankTable.classList.remove('hidden');
+                tabs[0].classList.remove('active');
+                tabs[1].classList.add('active');
+            }
         }
 
-        function syncInputs(inputId, rangeId) {
-            const input = document.getElementById(inputId);
-            const range = document.getElementById(rangeId);
-            
-            input.addEventListener('input', () => {
-                range.value = input.value;
-                calculateEMI();
-            });
-            
-            range.addEventListener('input', () => {
-                input.value = range.value;
-                calculateEMI();
-            });
+        function formatCurrency(amount) {
+            return '₹' + Math.round(amount).toLocaleString('en-IN');
         }
 
-        function calculateEMI() {
-            const principal = parseFloat(document.getElementById('loanAmount').value);
-            const annualRate = parseFloat(document.getElementById('interestRate').value);
+        function calculate() {
+            const loanAmount = parseFloat(document.getElementById('loanAmount').value);
             const tenure = parseInt(document.getElementById('loanTenure').value);
+            const bankYearlyRate = parseFloat(document.getElementById('bankInterest').value);
+            const nonBankYearlyRate = parseFloat(document.getElementById('nonBankInterest').value);
 
-            if (isNaN(principal) || isNaN(annualRate) || isNaN(tenure) || 
-                principal <= 0 || annualRate <= 0 || tenure <= 0) {
+            if (!loanAmount || !tenure || !bankYearlyRate || !nonBankYearlyRate) {
+                alert('Please fill all fields');
                 return;
             }
 
-            const monthlyRate = annualRate / 12 / 100;
-            
-            let emi;
-            if (monthlyRate === 0) {
-                emi = principal / tenure;
-            } else {
-                emi = principal * monthlyRate * Math.pow(1 + monthlyRate, tenure) / 
-                      (Math.pow(1 + monthlyRate, tenure) - 1);
-            }
+            const bankMonthlyRate = bankYearlyRate / 12 / 100;
+            const nonBankMonthlyRate = nonBankYearlyRate / 12 / 100;
 
-            const totalAmount = emi * tenure;
-            const totalInterest = totalAmount - principal;
+            // Bank Method (EMI - Reducing Balance)
+            const bankEMI = (loanAmount * bankMonthlyRate * Math.pow(1 + bankMonthlyRate, tenure)) / 
+                            (Math.pow(1 + bankMonthlyRate, tenure) - 1);
+            const bankTotalAmount = bankEMI * tenure;
+            const bankTotalInterest = bankTotalAmount - loanAmount;
 
-            document.getElementById('emiAmount').textContent = formatNumber(emi);
-            document.getElementById('principalAmount').textContent = formatNumber(principal);
-            document.getElementById('totalInterest').textContent = formatNumber(totalInterest);
-            document.getElementById('totalAmount').textContent = formatNumber(totalAmount);
-            document.getElementById('tenureDisplay').textContent = tenure;
+            // Non-Bank Method (Flat Rate)
+            const nonBankMonthlyInterest = loanAmount * nonBankMonthlyRate;
+            const nonBankTotalInterest = nonBankMonthlyInterest * tenure;
+            const nonBankTotalAmount = loanAmount + nonBankTotalInterest;
+
+            // Calculate savings
+            const savings = nonBankTotalAmount - bankTotalAmount;
+            const savingsPercent = (savings / nonBankTotalAmount * 100).toFixed(1);
+
+            // Update Bank Method UI
+            document.getElementById('bankEMI').textContent = formatCurrency(bankEMI);
+            document.getElementById('bankPrincipal').textContent = formatCurrency(loanAmount);
+            document.getElementById('bankAvgInterest').textContent = formatCurrency(bankTotalInterest / tenure);
+            document.getElementById('bankInterest').textContent = formatCurrency(bankTotalInterest);
+            document.getElementById('bankTotal').textContent = formatCurrency(bankTotalAmount);
+
+            // Update Non-Bank Method UI
+            document.getElementById('nonBankMonthly').textContent = formatCurrency(nonBankMonthlyInterest);
+            document.getElementById('nonBankPrincipal').textContent = formatCurrency(loanAmount);
+            document.getElementById('nonBankMonthlyFixed').textContent = formatCurrency(nonBankMonthlyInterest);
+            document.getElementById('nonBankInterest').textContent = formatCurrency(nonBankTotalInterest);
+            document.getElementById('nonBankTotal').textContent = formatCurrency(nonBankTotalAmount);
+
+            document.getElementById('savingsAmount').textContent = formatCurrency(savings);
+            document.getElementById('savingsText').textContent = `That's ${savingsPercent}% less than Non-Bank method!`;
+
+            // Generate visualizations
+            generateBankTable(loanAmount, bankEMI, bankMonthlyRate, tenure);
+            generateNonBankTable(loanAmount, nonBankMonthlyInterest, tenure);
+            generateChart(loanAmount, bankEMI, bankMonthlyRate, tenure);
+
+            document.getElementById('results').classList.remove('hidden');
         }
 
-        function adjustLoanAmount(direction) {
-            const loanInput = document.getElementById('loanAmount');
-            const adjustValue = parseFloat(document.getElementById('adjustValue').value) || 0;
-            const currentValue = parseFloat(loanInput.value) || 0;
+        function generateBankTable(principal, emi, monthlyRate, tenure) {
+            const tbody = document.getElementById('bankTableBody');
+            tbody.innerHTML = '';
             
-            let newValue = currentValue + (direction * adjustValue);
+            let balance = principal;
+            let showAll = tbody.dataset.showAll === 'true';
+            const displayMonths = showAll ? tenure : Math.min(tenure, 12);
             
-            // Ensure minimum value
-            if (newValue < 10000) {
-                newValue = 10000;
+            for (let month = 1; month <= displayMonths; month++) {
+                const interest = balance * monthlyRate;
+                const principalPaid = emi - interest;
+                const openingBalance = balance;
+                balance -= principalPaid;
+                
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = month;
+                row.insertCell(1).textContent = formatCurrency(openingBalance);
+                row.insertCell(2).textContent = formatCurrency(emi);
+                row.insertCell(3).textContent = formatCurrency(interest);
+                row.insertCell(4).textContent = formatCurrency(principalPaid);
+                row.insertCell(5).textContent = formatCurrency(Math.max(0, balance));
             }
-            
-            // Ensure maximum value
-            if (newValue > 10000000) {
-                newValue = 10000000;
+
+            if (tenure > 12 && !showAll) {
+                const row = tbody.insertRow();
+                row.className = 'expand-row';
+                row.onclick = function() {
+                    tbody.dataset.showAll = 'true';
+                    calculate();
+                };
+                const cell = row.insertCell(0);
+                cell.colSpan = 6;
+                cell.innerHTML = '<span class="expand-icon">▼</span> Click to show all ' + tenure + ' months';
+            } else if (showAll && tenure > 12) {
+                const row = tbody.insertRow();
+                row.className = 'expand-row';
+                row.onclick = function() {
+                    tbody.dataset.showAll = 'false';
+                    calculate();
+                    document.getElementById('bankTable').scrollIntoView({ behavior: 'smooth' });
+                };
+                const cell = row.insertCell(0);
+                cell.colSpan = 6;
+                cell.innerHTML = '<span class="expand-icon">▲</span> Click to show less';
             }
-            
-            loanInput.value = newValue;
-            document.getElementById('loanAmountRange').value = newValue;
-            calculateEMI();
         }
 
-        syncInputs('loanAmount', 'loanAmountRange');
-        syncInputs('interestRate', 'interestRateRange');
-        syncInputs('loanTenure', 'loanTenureRange');
+        function generateNonBankTable(principal, monthlyInterest, tenure) {
+            const tbody = document.getElementById('nonBankTableBody');
+            tbody.innerHTML = '';
+            
+            let cumulativeInterest = 0;
+            let showAll = tbody.dataset.showAll === 'true';
+            const displayMonths = showAll ? tenure : Math.min(tenure, 12);
+            
+            for (let month = 1; month <= displayMonths; month++) {
+                cumulativeInterest += monthlyInterest;
+                
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = month;
+                row.insertCell(1).textContent = formatCurrency(principal);
+                row.insertCell(2).textContent = formatCurrency(monthlyInterest);
+                row.insertCell(3).textContent = formatCurrency(cumulativeInterest);
+            }
 
-        calculateEMI();
+            if (tenure > 12 && !showAll) {
+                const row = tbody.insertRow();
+                row.className = 'expand-row';
+                row.onclick = function() {
+                    tbody.dataset.showAll = 'true';
+                    calculate();
+                };
+                const cell = row.insertCell(0);
+                cell.colSpan = 4;
+                cell.innerHTML = '<span class="expand-icon">▼</span> Click to show all ' + tenure + ' months';
+            } else if (showAll && tenure > 12) {
+                const row = tbody.insertRow();
+                row.className = 'expand-row';
+                row.onclick = function() {
+                    tbody.dataset.showAll = 'false';
+                    calculate();
+                    document.getElementById('nonBankTable').scrollIntoView({ behavior: 'smooth' });
+                };
+                const cell = row.insertCell(0);
+                cell.colSpan = 4;
+                cell.innerHTML = '<span class="expand-icon">▲</span> Click to show less';
+            }
+        }
+
+        function generateChart(principal, bankEMI, bankMonthlyRate, tenure) {
+            const ctx = document.getElementById('comparisonChart').getContext('2d');
+            
+            const months = [];
+            const bankBalances = [];
+            const nonBankBalances = [];
+            
+            let bankBalance = principal;
+            
+            for (let month = 0; month <= tenure; month++) {
+                months.push(month);
+                bankBalances.push(Math.round(bankBalance));
+                nonBankBalances.push(principal);
+                
+                if (month < tenure) {
+                    const interest = bankBalance * bankMonthlyRate;
+                    const principalPaid = bankEMI - interest;
+                    bankBalance -= principalPaid;
+                }
+            }
+            
+            if (comparisonChart) {
+                comparisonChart.destroy();
+            }
+            
+            comparisonChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Bank Method - Balance Reduces',
+                        data: bankBalances,
+                        borderColor: '#1a73e8',
+                        backgroundColor: 'rgba(26, 115, 232, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: 'Non-Bank Method - Balance Stays Same',
+                        data: nonBankBalances,
+                        borderColor: '#f57c00',
+                        backgroundColor: 'rgba(245, 124, 0, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 12
+                                },
+                                padding: 15,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ₹' + context.parsed.y.toLocaleString('en-IN');
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + (value/1000).toFixed(0) + 'K';
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Month',
+                                font: {
+                                    weight: 'bold'
+                                }
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        window.onload = function() {
+            calculate();
+        };
     </script>
 </body>
 </html>
